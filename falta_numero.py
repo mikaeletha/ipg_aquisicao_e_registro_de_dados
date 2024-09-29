@@ -11,12 +11,13 @@ nome_arquivo = 'dados_luz.csv'
 ser = serial.Serial(porta_serial, baud_rate, timeout=timeout)
 
 with open(nome_arquivo, 'w', newline='') as csvfile:
-    fieldnames = ['Index', 'DataHora', 'Luz (lx)']
+    fieldnames = ['Index', 'DataHora', 'Luz (lx)', 'Observacao']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=';')
 
     writer.writeheader()
 
     try:
+        lx = []
         index = 0
 
         while True:
@@ -26,19 +27,26 @@ with open(nome_arquivo, 'w', newline='') as csvfile:
                 luz = str(linha).replace('sensor =', '')
                 luz = float(luz)
                 data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                observacao = ""
+                lx.append(luz)
 
-                if index % 3 != 0 or index == 0:
-                    dados = {
-                        'Index': index,
-                        'DataHora': data_hora,
-                        'Luz (lx)': str(luz).replace('.', ',')
-                    }
-                    print(f"Index: {index}, Data: {data_hora}, Luz: {luz} lx")
-                    writer.writerow(dados)
-                else:
-                    print(F"Faltou a linha {index}")
+                if index % 3 == 0 and index != 0:
+                    luz_1 = lx[-2]
+                    luz_2 = lx[-3]
+                    luz = (luz_1 + luz_2) / 2
+                    observacao = f"Esse valor e a media de {luz_1} e {luz_2}"
 
-                index = index + 1
+                dados = {
+                    'Index': index,
+                    'DataHora': data_hora,
+                    'Luz (lx)': str(luz).replace('.', ','),
+                    'Observacao': observacao
+                }
+
+                print(f"Index: {index}, Data: {data_hora}, Luz: {
+                      luz} lx, Obeservacao: {observacao}")
+                writer.writerow(dados)
+                index += 1
 
     except KeyboardInterrupt:
         print("Interrupção manual pelo usuário.")
