@@ -11,7 +11,7 @@ nome_arquivo = 'dados_luz.csv'
 ser = serial.Serial(porta_serial, baud_rate, timeout=timeout)
 
 with open(nome_arquivo, 'w', newline='') as csvfile:
-    fieldnames = ['DataHora', 'Luz (lx)']
+    fieldnames = ['Index', 'DataHora', 'Luz (lx)']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=';')
 
     writer.writeheader()
@@ -29,11 +29,14 @@ with open(nome_arquivo, 'w', newline='') as csvfile:
 
                 if index % 3 != 0 or index == 0:
                     dados = {
+                        'Index': index,
                         'DataHora': data_hora,
                         'Luz (lx)': str(luz).replace('.', ',')
                     }
                     print(f"Index: {index}, Data: {data_hora}, Luz: {luz} lx")
                     writer.writerow(dados)
+                else:
+                    print(F"Faltou a linha {index}")
 
                 index = index + 1
 
