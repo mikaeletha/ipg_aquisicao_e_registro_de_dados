@@ -17,8 +17,8 @@ with open(nome_arquivo, 'w', newline='') as csvfile:
     writer.writeheader()
 
     try:
-        lx = []
         index = 0
+        dados_duplicados = []  # Lista para armazenar os dados duplicados
 
         while True:
             linha = ser.readline().decode('utf-8').strip()
@@ -35,17 +35,22 @@ with open(nome_arquivo, 'w', newline='') as csvfile:
                     'Observacao': ""
                 }
 
-                print(f"Index: {index}, Data: {data_hora}, Luz: {
-                      luz} lx, Observacao: {dados['Observacao']}")
-
-                writer.writerow(dados)
-
-                # Duplicar se multiplo de 3
+                # Se múltiplo de 3, duplicar a linha
                 if index % 3 == 0 and index != 0:
-                    print(f"Index: {index}, Data: {data_hora}, Luz: {
-                          luz} lx, Observacao: 'Esse valor foi duplicado'")
+                    # Adiciona a linha original
+                    dados_duplicados.append(dados.copy())
                     dados['Observacao'] = "Esse valor foi duplicado"
-                    writer.writerow(dados)
+                    # Adiciona a linha duplicada
+                    dados_duplicados.append(dados.copy())
+
+                else:
+                    dados_duplicados.append(dados)
+
+                # print(dados_duplicados)
+                print("\nDados duplicados:")
+                for item in dados_duplicados:
+                    print(f"Index: {item['Index']}, Data: {item['DataHora']}, Luz: {
+                          item['Luz (lx)']}, Observação: {item['Observacao']}")
 
                 index += 1
 
